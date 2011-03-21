@@ -1,0 +1,22 @@
+== Rails model doc generator(Rake Task)
+
+	* Beta version!!! Currently no support, no warranty *.	
+
+== Usage & Example
+	Default:
+	# Copy templates folder to your app/doc
+	cp -R templates/ path/to/your_app/doc
+	
+	# Generate config file for generator
+	rake elvuel:config APP=model_doc_name
+
+	# Setting your models folder in the config file.
+	key => :folders(Array)
+
+	# Generate docs
+	rake elvuel:gen_dbdoc_files FORCE_RELOAD=true
+	
+== Author
+
+	Elvuel(elvuel@gmail.com)
+	Copyright (c) 2011 elvuel(http://elvuel.com), released under the MIT license

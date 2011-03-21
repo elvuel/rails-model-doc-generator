@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta name="Content-Type" content="text/html; charset=UTF-8"/>
+  <title>Model: <%= @model %></title>
+  <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8"/>
+</head>
+<body>
+<div id="header">
+  <div id="menu">
+    <a href="index.html" target="_top">Index</a> &raquo;
+    <span class="title"><%= Time.now.strftime("%Y-%m-%d") %></span>
+  </div>
+  <div id="search">
+    <a id="class_list_link" href="index.html">Index</a>
+  </div>
+  <div class="clear"></div>
+</div>
+<div id="content"><h1>Model: <%= @model %>(<%= @human_name %>)
+</h1>
+  <dl class="box">
+    <dt class="r1">Inherits:</dt>
+    <dd class="r1">
+      <% @inherits.each do |item| %>
+          <span class="inheritName">
+            <% if item != "ActiveRecord::Base" %>
+                <a href='<%= item.underscore.gsub("/", "_")%>.html'><%= item %></a>
+            <% else %>
+                <%= item %>
+            <% end %>
+          </span>
+      <% end %>
+    </dd>
+    <dt class="r2">Defined in:</dt>
+    <dd class="r2">
+      <% @defined_in.each do |locate| %>
+          <span class="inheritName"><%= locate %></span><br/>
+      <% end %>
+    </dd>
+    <dt class="r2">Database:</dt>
+    <dd class="r2"><%= @database %></dd>
+    <dt class="r2 last">Table name:</dt>
+    <dd class="r2 last"><%= @table_name %></dd>
+  </dl>
+  <div class="clear"></div>
+  <h2>Table schema</h2>
+
+  <div class="docstring">
+    <table width="70%" align="left" bgcolor="#999" cellpadding="0" cellspacing="1">
+      <tr bgcolor="#eee">
+        <th height="35">Column name</th>
+        <th>Column type</th>
+        <th>Column attr</th>
+        <th>Human name</th>
+      </tr>
+      <% if @schema.is_a? Array %>
+
+      <% @schema.each do |item| %>
+          <tr bgcolor="#fff">
+            <td height="30"><%= item[:name] %></td>
+            <td><%= item[:type] %></td>
+            <td><%= item[:attrs] %></td>
+            <td><%= item[:human_name] %></td>
+          </tr>
+      <% end %>
+      <% else %>
+          <tr bgcolor="#fff">
+            <td height="30" colspan="4" align="center"><%= @schema %></td>
+          </tr>
+      <% end %>
+
+    </table>
+  </div>
+  <div class="clear"></div>
+  <h2>Table index</h2>
+
+  <div class="docstring">
+    <table width="70%" align="left" bgcolor="#999" cellpadding="0" cellspacing="1">
+      <tr bgcolor="#eee">
+        <th height="35">Name</th>
+        <th>Column</th>
+        <th>Unique?</th>
+      </tr>
+      <% @db_indexes.each do |index| %>
+          <tr bgcolor="#fff">
+            <td height="30"><%= index[:name] %></td>
+            <td><%= index[:columns] %></td>
+            <td><%= index[:unique] %></td>
+          </tr>
+      <% end %>
+
+    </table>
+  </div>
+  <div class="clear"></div>
+  <h2>Model association</h2>
+
+  <div class="docstring">
+    <table width="100%" align="left" bgcolor="#999" cellpadding="0" cellspacing="1">
+      <tr bgcolor="#eee">
+        <th>Macro</th>
+        <th height="35">Association key</th>
+        <th>Association(model)</th>
+        <th>Foreign key</th>
+        <th>Primary key</th>
+        <th>Options</th>
+      </tr>
+      <% @associations.each do |info| %>
+          <tr bgcolor="#fff">
+            <td><%= info[:macro] %>(<%= info[:type] %>)
+              <% if info[:type] == "through" %>Through =>
+                  <a href="<%= info[:through].underscore.gsub("/", "_") %>.html"><%= info[:through] %></a>
+              <% end %>
+            </td>
+            <td height="30"><%= info[:name] %></td>
+            <td>
+              <% if info[:association_classes] %>
+                  <% info[:association_classes].each do |item| %>
+                      <a href="<%= item.underscore.gsub("/", "_") %>.html"><%= item %></a>
+                      <br/>
+                  <% end %>
+              <% end %>
+            </td>
+            <td><%= info[:foreign_key] %></td>
+            <td><%= info[:primary_key] %></td>
+            <td><%= info[:options] %></td>
+          </tr>
+      <% end %>
+    </table>
+  </div>
+  <div class="clear"></div>
+  <h2>Named scope(AR)</h2>
+
+  <div class="docstring">
+    <ul class="summary">
+
+      <li class="public ">
+        <% @named_scopes.each do |ns| %>
+            <span class="summary_signature"><%= ns %></span>
+        <% end %>
+      </li>
+
+    </ul>
+
+  </div>
+  <div class="clear"></div>
+  <h2>Singleton methods</h2>
+
+  <div class="docstring">
+    <ul class="summary">
+
+      <li class="public ">
+        <% @singleton_methods.each do |sm| %>
+            <span class="summary_signature"><%= sm %></span>
+        <% end %>
+      </li>
+
+    </ul>
+
+  </div>
+  <div class="clear"></div>
+  <h2>Summary</h2>
+
+  <div class="docstring">
+  </div>
+  <div class="clear"></div>
+</div>
+<div id="footer">
+  <%= Time.now %> by Elvuel (elvuel@gmail.com)
+</div>
+</body>
+</html>
