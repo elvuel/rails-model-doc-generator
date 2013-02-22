@@ -297,7 +297,7 @@ namespace :elvuel do
     model_folders = @config["folders"]
 
     # require all files under 'models folder'
-    model_folders.each { |folder| Dir.glob(File.join(folder, "**", "*.rb")).each{ |file| require file } }
+    model_folders.each { |folder| Dir.glob(File.join(folder, "**", "*.rb")).each{ |file| require File.join(Rails.root, file) } }
 
     # get all ActiveRecord::Base subclasses
     models = []
@@ -341,6 +341,16 @@ namespace :elvuel do
         false
       end
 
+      #storaged_db = model.connection.current_database
+      db_config = model.connection.instance_variable_get(:@config)
+      if db_config
+        storaged_db = db_config[:database].to_s
+      else
+        storaged_db = ''
+      end
+
+      storaged_db.gsub!(/#{Rails.root}/, '')
+
       if table_exist
         if model.columns.empty? # tableless
           doc[key][:database]      = "Tableless(none)"
@@ -348,16 +358,17 @@ namespace :elvuel do
           doc[key][:table_schema]  = "Tableless(none)"
           doc[key][:table_indexes] = "Tableless(none)"
         else
-          doc[key][:database]      = model.connection.current_database
+          p model.connection.methods.grep(/data/).sort
+          doc[key][:database]      = storaged_db
           doc[key][:table_name]    = model.table_name
           doc[key][:table_schema]  = get_schema_info(model, :simple_indexes => true)
           doc[key][:table_indexes] = get_index_info(model)
         end
       else
-        doc[key][:database]      = model.connection.current_database
+        doc[key][:database]      = storaged_db
         doc[key][:table_name]    = model.table_name
-        doc[key][:table_schema]  = [{ :name => "table #{model.connection.current_database}.#{model.table_name} doesn't exist", :type => "NULL", :attrs => "NULL", :human_name => "NULL"  }]
-        doc[key][:table_indexes] = [{ :name => "table #{model.connection.current_database}.#{model.table_name} doesn't exist", :columns => "NULL", :unique => "NULL" }]
+        doc[key][:table_schema]  = [{ :name => "table #{storaged_db}.#{model.table_name} doesn't exist", :type => "NULL", :attrs => "NULL", :human_name => "NULL"  }]
+        doc[key][:table_indexes] = [{ :name => "table #{storaged_db}.#{model.table_name} doesn't exist", :columns => "NULL", :unique => "NULL" }]
       end
 
       # I18n human name
