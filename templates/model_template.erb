@@ -107,7 +107,7 @@
       </tr>
       <% @associations.each do |info| %>
           <tr bgcolor="#fff">
-            <td><%= info[:macro] %>(<%= info[:type] %>)
+            <td><%= info[:macro] %>(<%= info[:name] %>)
               <% if info[:type] == "through" %>Through =>
                   <a href="<%= info[:through].underscore.gsub("/", "_") %>.html"><%= info[:through] %></a>
               <% end %>

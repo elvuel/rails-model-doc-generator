@@ -112,19 +112,8 @@ namespace :elvuel do
           # ActiveRecord::Reflection::ThroughReflection[::AssociationReflection|::AggregateReflection]
           association_classes = []
 
-          case info[:type]
-
-            when "Through"
-              # TODO ThroughReflection details!
-              association_class = association.active_record.send(:compute_type, association.send(:class_name))
-              association_classes << association_class
-              info[:through]= association.through_reflection.klass.to_s
-              # if association.send(:options).has_key?(:source_type)
-              #  association_classes << association.send(:class_name)
-              # else
-                
-              # end
-            when "Association"
+          case info[:macro].to_sym
+            when :belongs_to
               if association.send(:options).has_key?(:polymorphic)
                 association_classes = get_polymorphic_as_associations_classes(klass, association)
               else
@@ -134,21 +123,34 @@ namespace :elvuel do
                   association_classes << association.active_record.send(:compute_type, association.send(:class_name))
                 end
               end
-            when "Aggregate"
+            when :has_and_belongs_to_many
               if association.send(:options).has_key?(:class_name)
                 association_classes << association.send(:class_name).constantize
               else
                 association_classes << association.active_record.send(:compute_type, association.send(:class_name))
               end
+
+            when :has_many, :has_one
+              if association.send(:options).has_key?(:class_name)
+                association_classes << association.send(:class_name).constantize
+              else
+                association_classes << association.send(:name).to_s.singularize.capitalize.constantize
+              end
+            else
+              association_classes = []
           end
 
           info[:association_classes]= association_classes.map(&:to_s)
           info[:foreign_key]= association.send(:association_foreign_key).to_s
-          info[:primary_key]= association.send(:primary_key_name).to_s
+          info[:primary_key]= begin
+            association.send(:association_primary_key).to_s
+          rescue
+            "pending"
+          end
           info[:options]= association.send(:options).inspect if association.respond_to?(:options)
 
           associations << info
-        rescue
+        rescue Exception => e
           @exception_associations[klass.to_s] ||= []
           @exception_associations[klass.to_s] << "#{association.send(:macro).to_s} :#{key}"
         end
@@ -156,6 +158,7 @@ namespace :elvuel do
     end
     associations
   end
+
 
   # Get all ActiveRecord named_scopes
   def get_named_scope_info(klass)
